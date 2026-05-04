@@ -1,0 +1,35 @@
+import { StyleSheet } from 'react-native';
+import Colors from '../../features/theme/Colors';
+
+const LayoutStyle = StyleSheet.create({
+  topBar: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#555',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  topBarBack: {
+    color: Colors.onPrimary,
+    fontSize: 18.0,
+    fontWeight: "bold"
+  },
+  topBarText: {
+    color: Colors.onPrimary,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+  },
+  bottomBar: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#555',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+});
+
+export default LayoutStyle;

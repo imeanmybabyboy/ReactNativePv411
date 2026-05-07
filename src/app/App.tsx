@@ -8,7 +8,7 @@ import {
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Layout from './ui/Layout';
 import AppStyle from './ui/AppStyle';
-import { useEffect, useState } from 'react';
+import { act, useEffect, useState } from 'react';
 import IRoute from '../features/Router/model/IRoute';
 import AppContext from '../features/context/AppContext';
 
@@ -40,7 +40,16 @@ export default function App() {
       newRoute.page !== activeRoute.page ||
       newRoute.slug !== activeRoute.slug
     ) {
-      setHistory([...history, activeRoute]);
+      if (newRoute.page !== 'notFound') {
+        const lastHistory = history[history.length - 1];
+        const isRepeated =
+          lastHistory?.page === activeRoute.page &&
+          lastHistory?.slug === activeRoute.slug;
+
+        if (!isRepeated) {
+          setHistory([...history, activeRoute]);
+        }
+      }
       setActiveRoute(newRoute);
     }
   };

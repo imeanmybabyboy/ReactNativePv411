@@ -11,6 +11,7 @@ import { useContext } from 'react';
 import AppContext from '../../features/context/AppContext';
 import Home from '../../pages/home/Home';
 import Calc from '../../pages/calc/Calc';
+import NotFound from '../../pages/notFound/NotFound';
 
 export default function Layout() {
   const { navigate, activeRoute } = useContext(AppContext);
@@ -36,7 +37,7 @@ export default function Layout() {
         ) : activeRoute.page === 'calc' ? (
           <Calc />
         ) : (
-          <Text>Not Found</Text>
+          <NotFound />
         )}
       </View>
       {width < height && (
@@ -47,6 +48,10 @@ export default function Layout() {
 
           <TouchableOpacity onPress={() => navigate('calc')}>
             <Text>Calc</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigate('notFound')}>
+            <Text>Not Found</Text>
           </TouchableOpacity>
         </View>
       )}

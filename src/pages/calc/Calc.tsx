@@ -3,22 +3,49 @@ import { CalcButtonTypes } from './ui/buttons/CalcButtonTypes';
 import { Text, useWindowDimensions, View } from 'react-native';
 import CalcStyle from './ui/CalcStyle';
 import { useState } from 'react';
+import { CalcOperations } from './model/CalcOperations';
+
+interface ICalcState {
+  expression: string;
+  result: string;
+  isNeedClearExpression: boolean;
+  isNeedClearResult: boolean;
+  operation: (typeof CalcOperations)[keyof typeof CalcOperations] | null;
+  argument1: number | null;
+}
+
+const initialState: ICalcState = {
+  expression: '',
+  result: '0',
+  isNeedClearExpression: false,
+  isNeedClearResult: false,
+  operation: null,
+  argument1: null,
+};
 
 export default function Calc() {
-  const [expression, setExpression] = useState<string>('');
-  const [result, setResult] = useState<string>('0');
+  const [calcState, setCalcState] = useState<ICalcState>(initialState);
+
   const { width, height } = useWindowDimensions();
   const dotSymbol = ',';
 
   const digitPress = (title: string) => {
-    let res = result;
-    if (res == '0') {
+    let res = calcState.result;
+    if (res == '0' || calcState.isNeedClearResult) {
       res = '';
     }
-    showResult(res + title);
+    let expr = calcState.isNeedClearExpression ? '' : calcState.expression;
+
+    setCalcState({
+      ...calcState,
+      expression: expr,
+      result: num2res(res + title),
+      isNeedClearExpression: false,
+      isNeedClearResult: false,
+    });
   };
 
-  const showResult = (res: string | number) => {
+  const num2res = (res: string | number): string => {
     if (typeof res === 'number') {
       res = res.toString().replace('.', dotSymbol);
     }
@@ -39,24 +66,28 @@ export default function Calc() {
       i += 3;
     }
     res = arr.join(' ') + fractPart;
-    setResult(res);
+    return res;
   };
 
   const dotPress = () => {
-    if (!result.includes(dotSymbol)) {
-      setResult(result + dotSymbol);
+    if (!calcState.result.includes(dotSymbol)) {
+      setCalcState({
+        ...calcState,
+        result: num2res(calcState.result + dotSymbol),
+      });
     }
   };
 
   const invPress = () => {
-    let num = res2Num(result);
+    let num = res2Num(calcState.result);
 
-    if (res2Num(result) === 0) {
-      setResult('Cannot divide by zero');
-    } else {
-      showResult(1.0 / num);
-      setExpression(`1 / ${num} =`);
-    }
+    setCalcState({
+      ...calcState,
+      expression: `1 / ${num} =`,
+      result: num2res(1.0 / num),
+      isNeedClearExpression: true,
+      isNeedClearResult: true,
+    });
   };
 
   const res2Num = (res: string) => {
@@ -64,21 +95,130 @@ export default function Calc() {
   };
 
   const clearPress = () => {
-    setResult('0');
-    setExpression('');
+    setCalcState({
+      ...calcState,
+      expression: '',
+      result: '0',
+      argument1: null,
+      isNeedClearExpression: false,
+      isNeedClearResult: false,
+    });
+  };
+
+  const clearEntryPress = () => {
+    setCalcState({
+      ...calcState,
+      expression: calcState.isNeedClearExpression ? '' : calcState.expression,
+      result: '0',
+      isNeedClearExpression: false,
+      isNeedClearResult: false,
+    });
+  };
+
+  const pmPress = () => {
+    if (calcState.result === '0' || calcState.isNeedClearResult) return;
+
+    let res = calcState.result.startsWith('-')
+      ? calcState.result.substring(1)
+      : '-' + calcState.result;
+
+    setCalcState({ ...calcState, result: res });
+  };
+
+  const sqrtPress = () => {
+    let num = res2Num(calcState.result);
+
+    setCalcState({
+      ...calcState,
+      expression: '\u221A' + num,
+      result: num < 0 ? 'Invalid input' : num2res(Math.sqrt(num)),
+      isNeedClearExpression: true,
+      isNeedClearResult: true,
+    });
+  };
+
+  const backspacePress = () => {
+    let res = calcState.isNeedClearResult
+      ? '0'
+      : calcState.result.substring(0, calcState.result.length - 1);
+
+    if (res === '' || res === '-') {
+      res = '0';
+    }
+
+    setCalcState({
+      ...calcState,
+      expression: calcState.isNeedClearExpression ? '' : calcState.expression,
+      result: num2res(res),
+      isNeedClearExpression: false,
+      isNeedClearResult: false,
+    });
+  };
+
+  const operationPress = (title: string) => {
+    let num = res2Num(calcState.result);
+    setCalcState({
+      ...calcState,
+      expression: res2Num(calcState.result) + title,
+      isNeedClearResult: true,
+      isNeedClearExpression: false,
+      operation:
+        title === CalcOperations.add
+          ? CalcOperations.add
+          : title === CalcOperations.sub
+          ? CalcOperations.sub
+          : title === CalcOperations.mul
+          ? CalcOperations.mul
+          : CalcOperations.div,
+      argument1: num,
+    });
+  };
+
+  const equalPress = () => {
+    if (calcState.operation === null) return;
+    let num = res2Num(calcState.result);
+    let res = calcState.argument1!;
+    switch (calcState.operation) {
+      case CalcOperations.add:
+        res += num;
+        break;
+      case CalcOperations.sub:
+        res -= num;
+        break;
+      case CalcOperations.mul:
+        res *= num;
+        break;
+      case CalcOperations.div:
+        res /= num;
+        break;
+    }
+    setCalcState({
+      ...calcState,
+      expression: calcState.expression + num + ' =',
+      result: num2res(res),
+      isNeedClearExpression: true,
+      isNeedClearResult: true,
+      operation: null,
+      argument1: null,
+    });
   };
 
   const portraitView = () => (
     <View style={CalcStyle.container}>
-      <Text style={CalcStyle.title}>Calculator</Text>
-      <Text style={CalcStyle.expression}>{expression}</Text>
+      <Text style={CalcStyle.title}>Calculator {CalcOperations.add}</Text>
+      <Text style={CalcStyle.expression}>{calcState.expression}</Text>
       <Text
         style={[
           CalcStyle.result,
-          { fontSize: result.length <= 12 ? 48.0 : (12 * 48) / result.length },
+          {
+            fontSize:
+              calcState.result.length <= 12
+                ? 48.0
+                : (12 * 48) / calcState.result.length,
+          },
         ]}
       >
-        {result}
+        {calcState.result}
       </Text>
 
       <View style={CalcStyle.kbRow}>
@@ -96,13 +236,21 @@ export default function Calc() {
       <View style={CalcStyle.keyboard}>
         <View style={CalcStyle.kbRow}>
           <CalcButton buttonType={CalcButtonTypes.operation} title="%" />
-          <CalcButton buttonType={CalcButtonTypes.operation} title="CE" />
+          <CalcButton
+            buttonType={CalcButtonTypes.operation}
+            title="CE"
+            action={clearEntryPress}
+          />
           <CalcButton
             buttonType={CalcButtonTypes.operation}
             title="C"
             action={clearPress}
           />
-          <CalcButton buttonType={CalcButtonTypes.operation} title={'\u232B'} />
+          <CalcButton
+            buttonType={CalcButtonTypes.operation}
+            title={'\u232B'}
+            action={backspacePress}
+          />
         </View>
         <View style={CalcStyle.kbRow}>
           <CalcButton
@@ -117,8 +265,13 @@ export default function Calc() {
           <CalcButton
             buttonType={CalcButtonTypes.operation}
             title={'\u221A\u{1D465}\u0305'}
+            action={sqrtPress}
           />
-          <CalcButton buttonType={CalcButtonTypes.operation} title={'\u00F7'} />
+          <CalcButton
+            buttonType={CalcButtonTypes.operation}
+            action={operationPress}
+            title={CalcOperations.div}
+          />
         </View>
         <View style={CalcStyle.kbRow}>
           <CalcButton
@@ -136,7 +289,11 @@ export default function Calc() {
             title="9"
             action={digitPress}
           />
-          <CalcButton buttonType={CalcButtonTypes.operation} title={'\u00D7'} />
+          <CalcButton
+            buttonType={CalcButtonTypes.operation}
+            action={operationPress}
+            title={CalcOperations.mul}
+          />
         </View>
         <View style={CalcStyle.kbRow}>
           <CalcButton
@@ -154,7 +311,11 @@ export default function Calc() {
             title="6"
             action={digitPress}
           />
-          <CalcButton buttonType={CalcButtonTypes.operation} title={'\u2212'} />
+          <CalcButton
+            buttonType={CalcButtonTypes.operation}
+            action={operationPress}
+            title={CalcOperations.sub}
+          />
         </View>
         <View style={CalcStyle.kbRow}>
           <CalcButton
@@ -172,12 +333,17 @@ export default function Calc() {
             title="3"
             action={digitPress}
           />
-          <CalcButton buttonType={CalcButtonTypes.operation} title={'\uFF0B'} />
+          <CalcButton
+            buttonType={CalcButtonTypes.operation}
+            action={operationPress}
+            title={CalcOperations.add}
+          />
         </View>
         <View style={CalcStyle.kbRow}>
           <CalcButton
             buttonType={CalcButtonTypes.digit}
             title={'\u207A/\u208B'}
+            action={pmPress}
           />
           <CalcButton
             buttonType={CalcButtonTypes.digit}
@@ -189,7 +355,11 @@ export default function Calc() {
             title={'\u2e34'}
             action={dotPress}
           />
-          <CalcButton buttonType={CalcButtonTypes.equal} title={'\uff1d'} />
+          <CalcButton
+            buttonType={CalcButtonTypes.equal}
+            title={'\uff1d'}
+            action={equalPress}
+          />
         </View>
       </View>
     </View>
@@ -199,12 +369,12 @@ export default function Calc() {
     <View style={CalcStyle.container}>
       <View style={CalcStyle.topRow}>
         <View style={CalcStyle.topCol}>
-          <Text style={CalcStyle.expression}>{expression}</Text>
+          <Text style={CalcStyle.expression}>{calcState.expression}</Text>
           <View style={CalcStyle.memory}>
             <Text>Memory buttons row</Text>
           </View>
         </View>
-        <Text style={CalcStyle.result}>{result}</Text>
+        <Text style={CalcStyle.result}>{calcState.result}</Text>
       </View>
 
       <View style={CalcStyle.keyboard}>

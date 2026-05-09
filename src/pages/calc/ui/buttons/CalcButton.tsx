@@ -23,10 +23,17 @@ export default function CalcButton({
       ? CalcButtonStyle.labelDigit
       : buttonType === CalcButtonTypes.equal
       ? CalcButtonStyle.labelEqual
+      : buttonType === CalcButtonTypes.memoryEnabled
+      ? CalcButtonStyle.memoryButton
+      : buttonType === CalcButtonTypes.memoryDisabled
+      ? CalcButtonStyle.memoryDisabled
       : CalcButtonStyle.labelOperation;
+
+  const isDisabled = buttonType === CalcButtonTypes.memoryDisabled;
 
   return (
     <TouchableOpacity
+      disabled={isDisabled}
       style={[CalcButtonStyle.button, bg]}
       onPress={() => {
         if (action) action(title);

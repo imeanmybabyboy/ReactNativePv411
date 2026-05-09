@@ -49,10 +49,13 @@ export default function Calc() {
   };
 
   const invPress = () => {
+    let num = res2Num(result);
+
     if (res2Num(result) === 0) {
       setResult('Cannot divide by zero');
     } else {
-      showResult(1.0 / res2Num(result));
+      showResult(1.0 / num);
+      setExpression(`1 / ${num} =`);
     }
   };
 
@@ -78,8 +81,16 @@ export default function Calc() {
         {result}
       </Text>
 
-      <View style={CalcStyle.memory}>
-        <Text>Memory buttons row</Text>
+      <View style={CalcStyle.kbRow}>
+        <CalcButton buttonType={CalcButtonTypes.memoryDisabled} title="MC" />
+        <CalcButton buttonType={CalcButtonTypes.memoryDisabled} title="MR" />
+        <CalcButton buttonType={CalcButtonTypes.memoryEnabled} title="M+" />
+        <CalcButton buttonType={CalcButtonTypes.memoryEnabled} title="M-" />
+        <CalcButton buttonType={CalcButtonTypes.memoryEnabled} title="MS" />
+        <CalcButton
+          buttonType={CalcButtonTypes.memoryDisabled}
+          title={'M\u02C5'}
+        />
       </View>
 
       <View style={CalcStyle.keyboard}>

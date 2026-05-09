@@ -30,6 +30,16 @@ const CalcButtonStyle = StyleSheet.create({
   labelEqual: {
     color: Colors.primary,
   },
+  memoryButton: {
+    color: Colors.onPrimary,
+    fontSize: 13.0,
+    backgroundColor: 'primary',
+  },
+  memoryDisabled: {
+    fontSize: 13.0,
+    color: 'grey',
+  },
+  bgMemoryDisabled: {},
 });
 
 export default CalcButtonStyle;

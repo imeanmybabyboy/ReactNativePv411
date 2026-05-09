@@ -29,13 +29,14 @@ const CalcStyle = StyleSheet.create({
   memory: {
     flex: 2,
     backgroundColor: '#252525',
+    fontSize: 14.0,
   },
   keyboard: {
     flex: 18,
     justifyContent: 'space-between',
   },
   kbRow: {
-    flex: 1,
+    flex: 2,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',

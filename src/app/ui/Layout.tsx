@@ -1,4 +1,5 @@
 import {
+  Image,
   Text,
   Touchable,
   TouchableOpacity,
@@ -12,6 +13,9 @@ import AppContext from '../../features/context/AppContext';
 import Home from '../../pages/home/Home';
 import Calc from '../../pages/calc/Calc';
 import NotFound from '../../pages/notFound/NotFound';
+import Rate from '../../pages/rate/Rate';
+import Anim from '../../pages/anim/Anim';
+import Game from '../../pages/game/Game';
 
 export default function Layout() {
   const { navigate, activeRoute } = useContext(AppContext);
@@ -36,6 +40,12 @@ export default function Layout() {
           <Home />
         ) : activeRoute.page === 'calc' ? (
           <Calc />
+        ) : activeRoute.page === 'rate' ? (
+          <Rate />
+        ) : activeRoute.page === 'anim' ? (
+          <Anim />
+        ) : activeRoute.page === 'game' ? (
+          <Game />
         ) : (
           <NotFound />
         )}
@@ -43,15 +53,38 @@ export default function Layout() {
       {width < height && (
         <View style={LayoutStyle.bottomBar}>
           <TouchableOpacity onPress={() => navigate('home')}>
-            <Text>Home</Text>
+            <Image
+              style={LayoutStyle.bottomBarImg}
+              source={require('../../features/assets/img/home.png')}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigate('calc')}>
-            <Text>Calc</Text>
+            <Image
+              style={LayoutStyle.bottomBarImg}
+              source={require('../../features/assets/img/calc.png')}
+            />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigate('notFound')}>
-            <Text>Not Found</Text>
+          <TouchableOpacity onPress={() => navigate('rate')}>
+            <Image
+              style={LayoutStyle.bottomBarImg}
+              source={require('../../features/assets/img/rate.png')}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigate('anim')}>
+            <Image
+              style={LayoutStyle.bottomBarImg}
+              source={require('../../features/assets/img/anim.png')}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigate('game')}>
+            <Image
+              style={LayoutStyle.bottomBarImg}
+              source={require('../../features/assets/img/game.jpg')}
+            />
           </TouchableOpacity>
         </View>
       )}

@@ -1,12 +1,31 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import Colors from '../../../features/theme/Colors';
 
 const HomeStyle = StyleSheet.create({
-  topBar: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#555',
+  container: {
+    flex: 1,
+    backgroundColor: '#444',
+  },
+  item: {
+    borderColor: Colors.onSecondary,
+    borderWidth: 1.5,
+    borderRadius: 7.0,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    marginHorizontal: 20.0,
+    marginVertical: 10.0,
+  },
+  img: {
+    width: 42.0,
+    height: 42.0,
+    tintColor: Colors.onPrimary,
+    marginHorizontal: 20.0,
+    marginVertical: 10.0,
+  },
+  text: {
+    color: Colors.onPrimary,
+    fontSize: 20.0,
   },
 });
+
+export default HomeStyle;

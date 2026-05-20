@@ -11,6 +11,8 @@ import AppStyle from './ui/AppStyle';
 import { act, useEffect, useState } from 'react';
 import IRoute from '../features/Router/model/IRoute';
 import AppContext from '../features/context/AppContext';
+import '../shared/extensions/DateExtensions';
+import '../shared/extensions/NumberExtensioins';
 
 export default function App() {
   const [history, setHistory] = useState<Array<IRoute>>([]);

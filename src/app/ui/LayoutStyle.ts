@@ -13,7 +13,7 @@ const LayoutStyle = StyleSheet.create({
   topBarBack: {
     color: Colors.onPrimary,
     fontSize: 18.0,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   topBarText: {
     color: Colors.onPrimary,
@@ -29,6 +29,11 @@ const LayoutStyle = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+  },
+  bottomBarImg: {
+    height: 34.0,
+    width: 34.0,
+    tintColor: Colors.onPrimary,
   },
 });
 

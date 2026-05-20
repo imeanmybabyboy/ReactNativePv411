@@ -1,0 +1,112 @@
+import {
+  Alert,
+  Image,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import RateStyle from './ui/RateStyle';
+import { useEffect, useState } from 'react';
+import NbuDao from '../../entities/nbu/api/NbuDao';
+import INbuRate from '../../entities/nbu/model/INbuRate';
+import DatePicker from 'react-native-date-picker';
+
+export default function Rate() {
+  const [rates, setRates] = useState<Array<INbuRate>>([]);
+  const [ratesShown, setRatesShown] = useState<Array<INbuRate>>([]);
+  const [fragment, setFragment] = useState<string>('');
+  const [date, setDate] = useState(new Date());
+  const [open, setOpen] = useState(false);
+
+  const updateRates = (dt?: Date | undefined) => {
+    NbuDao.loadRates(dt).then(setRates).catch(console.error);
+  };
+
+  useEffect(updateRates, []);
+
+  useEffect(() => {
+    if (rates.length > 0) {
+      setDate(Date.fromDotted(rates[0].exchangedate));
+    }
+  }, [rates]);
+
+  const filter = () => {
+    if (fragment == '') {
+      setRatesShown([...rates]);
+    } else {
+      setRatesShown(rates.filter(r => r.cc.includes(fragment)));
+    }
+  };
+
+  useEffect(filter, [fragment, rates]);
+
+  return (
+    <View style={RateStyle.container}>
+      <View style={RateStyle.titleRow}>
+        <View style={RateStyle.searchView}>
+          <Image
+            source={require('../../features/assets/img/search.png')}
+            style={RateStyle.searchImg}
+          />
+          <TextInput
+            value={fragment}
+            onChangeText={setFragment}
+            style={RateStyle.searchInput}
+          />
+        </View>
+        <Text style={RateStyle.pageTitle}>Курси НБУ</Text>
+        <TouchableOpacity
+          style={RateStyle.rateDateBtn}
+          onPress={() => setOpen(true)}
+        >
+          <Text style={RateStyle.rateDate}>{date.toDotted()}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={RateStyle.ratesContainer}>
+        {ratesShown.map((r, i) => (
+          <TouchableOpacity
+            key={r.cc}
+            style={[
+              RateStyle.rateItem,
+              i % 2 == 0 ? RateStyle.rateItemEven : RateStyle.rateItemOdd,
+            ]}
+            onPress={() => {
+              Alert.alert(
+                r.txt,
+                `Скорочення: ${r.cc}\nКод R-030: ${r.r030}\nКурс:\n  1 ${
+                  r.cc
+                } = ${r.rate} HRN\n  1 HRN = ${(1.0 / r.rate).toPrecision(5)} ${
+                  r.cc
+                }\nСпец позначка: ${r.special || '--'}\nДата: ${
+                  r.exchangedate
+                }`,
+                [{ text: 'OK', onPress: () => {} }],
+              );
+            }}
+          >
+            <Text style={RateStyle.rateItemCc}>{r.cc}</Text>
+            <Text style={RateStyle.rateItemTxt}>{r.txt}</Text>
+            <Text style={RateStyle.rateItemRate}>{r.rate}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <DatePicker
+        modal
+        mode="date"
+        open={open}
+        date={date}
+        onConfirm={date => {
+          setOpen(false);
+          updateRates(date);
+        }}
+        onCancel={() => {
+          setOpen(false);
+        }}
+      />
+    </View>
+  );
+}

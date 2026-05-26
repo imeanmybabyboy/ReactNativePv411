@@ -89,6 +89,37 @@ export default function Game() {
     loadBestScore();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      const timestamp = Date.now().toString();
+      const path = RNFS.DocumentDirectoryPath + '/lastExit.time';
+      RNFS.writeFile(path, timestamp, 'utf8');
+    };
+  }, []);
+
+  useEffect(() => {
+    const loadLastExit = async () => {
+      const path = RNFS.DocumentDirectoryPath + '/lastExit.time';
+      if (await RNFS.exists(path)) {
+        const content = await RNFS.readFile(path, 'utf8');
+        const lastExit = parseInt(content);
+        const elapsed = Date.now() - lastExit;
+
+        const totalMinutes = Math.floor(elapsed / 1000 / 60);
+        const totalHours = Math.floor(totalMinutes / 60);
+        const days = Math.floor(totalHours / 24);
+        const hours = totalHours % 24;
+        const minutes = totalMinutes % 60;
+        const seconds = minutes % 60;
+
+        const label = `You were away for ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`;
+        setGameState(prev => ({ ...prev, label }));
+      }
+    };
+
+    loadLastExit();
+  }, []);
+
   const spawnTile = () => {
     const freeTiles = [];
     for (let i = 0; i < N * N; i++) {

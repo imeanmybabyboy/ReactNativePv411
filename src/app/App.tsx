@@ -62,10 +62,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    console.log(history);
-  }, [history]);
-
-  useEffect(() => {
     const handler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction,
